@@ -32,4 +32,10 @@ Then all files were merged together:
 
 ## Filtering and calling effect of SNPs and indels
 
-We used **snpEFF** to predict the effect of a SNP as "low", "moderate", or "high" impact on gene function (
+We used **snpEFF** to predict the effect of a SNP as "low", "moderate", or "high" impact on gene function (details can be found **here**), and filtreing was done using **VCFTools**. The VCFs for SNPs and INDELS were done separately to be assessed separately. 
+
+        /Linux/jdk-17.0.5/bin/java -jar ~/snpEff/snpEff.jar download -v Guppy_female_1.0_MT.99
+        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/snpEff.jar -v -stats snpEff_unfiltered_genomic_all_SNPs.html Guppy_female_1.0_MT.99 all_unfiltered_pret_snps.vcf.gz > genomic_SNPs_unfiltered.vcf
+        vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --remove-indels --min-meanDP 7 --max-meanDP 112 --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_no_indels
+        vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --keep-only-indels --min-meanDP 7 --max-meanDP 112  --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_indels
+
