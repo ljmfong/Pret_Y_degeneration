@@ -39,3 +39,28 @@ We used **snpEFF** to predict the effect of a SNP as "low", "moderate", or "high
         vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --remove-indels --min-meanDP 7 --max-meanDP 112 --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_no_indels
         vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --keep-only-indels --min-meanDP 7 --max-meanDP 112  --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_indels
 
+I separated out the different impacts of the SNPs based on the annotated effect by snpEFF using **snpSift**, examples provided below:
+Low impact:
+        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'coding_sequence_variant'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > coding_sequence_variant_variants.vcf	
+
+Moderate impact:
+        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'missense_variant'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > missense_variants.vcf
+
+High impact:
+        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'stop_gained'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > stop_gained_variants.vcf
+
+
+Files were then concatenated and prepared to run using the Rscript:
+        cat high_impact_VCFs > high_impact_variants.vcf
+        sed -i '/^##/d' high_impact_variants.vcf
+        wc -l high_impact_variants.vcf
+
+## Checking for duplicate genes:
+
+I used VCFTools to identify duplicates following the pipeline by **Lin et al. (2022)**:
+        vcftools --gzvcf all_unfiltered_pret_snps.vcf.gz --site-depth --keep male_individs.txt --out male_unfilt_markdupe_filtered	
+        vcftools --gzvcf all_unfiltered_pret_snps.vcf.gz --site-depth --keep female_individs.txt --out female_unfilt_markdupe_filtered	
+        python gene_coverage.py gene_boundary.bed male_unfilt_markdupe_filtered.ldepth female_unfilt_markdupe_filtered.ldepth unfilt_markdupe_MFDepth.txt			
+        
+
+
