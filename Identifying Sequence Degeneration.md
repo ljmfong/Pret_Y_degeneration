@@ -5,7 +5,7 @@ Here are the commands used to identify the sequence degeneration of _P. reticula
 
 ## Alignment to female reference genome
 
-We used the Ensembl female _P. reticulata_ reference genome and aligned the DNA sequences using *BWA*. Here is an example command:
+We used the Ensembl female _P. reticulata_ reference genome and aligned the paired-end DNA sequences using **BWA**. Here is an example command:
 
-  /Linux/bin/bwa mem -t 12 ~/assemblies/Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa /MankFlex/ljmfong/Yuying_ret_family/NS.1357.002.IDT_i7_9---IDT_i5_9.P433_R1.fastq.gz /MankFlex/ljmfong/Yuying_ret_family/NS.1357.002.IDT_i7_9---IDT_i5_9.P433_R2.fastq.gz > /MankFlex/ljmfong/yuying_pret/Fam1_Mother_P433.sam
-  /Linux/samtools-1.9/bin/samtools sort -o /MankFlex/ljmfong/yuying_pret/sorted_sam_females/Fam1_Mother_P433.sorted.sam /MankFlex/ljmfong/yuying_pret/Fam1_Mother_P433.sam
+  bwa mem -t 12 Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa sample_forward_R1.fastq.gz sample_reverse_R2.fastq.gz > sample_id.sam
+  samtools sort -o sample_id.sorted.sam sample_id.sam
