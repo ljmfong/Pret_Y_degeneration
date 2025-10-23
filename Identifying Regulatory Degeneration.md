@@ -3,69 +3,22 @@
 Here are the commands used to identify the regulatory degeneration of _P. reticulata_ following the attainment of scRNA-seq data from Darolti & Mank (2023). 
 ----------------------------------------------------------
 
-## Prepping VCF files from theacquired sorted BAM files
+## Prepping VCF files from the sorted BAM files
 
-We used the possorted_genome_bam.bam files from the scRNA seq data available from Darolti & Mank (2023). We used  **[cellSNP-lite](https://github.com/single-cell-genetics/cellSNP)** to generate our VCF files. Here is an example command:
+We used the possorted_genome_bam.bam files from the scRNA seq data available from Darolti & Mank (2023). We used  **[cellSNP-lite](https://github.com/single-cell-genetics/cellSNP)** to generate our VCF files. We have barcode info for each library, so we did one BAM library at a time with the barcode information. cellSNP command is run as: cellsnp-lite -s $BAM -b $BARCODE -O $OUT_DIR -p 10 --minMAF 0.1 --minCOUNT 100 --gzip --chrom
+Here is an example command:
 
-    bwa mem -t 12 Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa sample_forward_R1.fastq.gz sample_reverse_R2.fastq.gz > sample_id.sam
-    samtools sort -o sample_id.sorted.sam sample_id.sam
+    cellsnp-lite -s sample6_possorted_genome_bam.bam -b sample6_barcodes.tsv.gz -O ~/scRNA_cellsnp_files/Lib6 --gzip -f Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa --minMAF 0.01 --minCOUNT 10 -p 16 --maxDEPTH 100000 --chrom LG1,LG2,LG3,LG4,LG5,LG6,LG7,LG8,LG9,LG10,LG11,LG12,LG13,LG14,LG15,LG16,LG17,LG18,LG19,LG20,LG21,LG22,LG23
 
-After all the samples were mapped to the reference genome and sorted, I made a text file containing a list of the sorted bam files and their full paths. Then I used **BCFTools** to create my VCF and indexed the VCF.
+Following VCF generation, we re-formatted the VCF files to fit the format for **[scAlleleCount](https://github.com/barkasn/scAlleleCount)**. Example command below:
 
-        bcftools mpileup --threads 12 -Ou -q 20 -Q 20 -a FORMAT/AD,FORMAT/DP -f Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa -b Pret_bamlist.txt | bcftools call -mv -Oz -f GQ,GP -o pret_individ.vcf.gz
-        tabix pret_individ.vcf.gz	
+        gunzip Lib6/cellSNP.base.vcf.gz
+        awk '{if ($1 ~/^LG/) print $1, $2, $4, $5}' Lib6/cellSNP.base.vcf > format_VCFs/sample6_snps_scAC.txt
+        bgzip -c sample6_snps_filtered.vcf > sample6_snps_filtered.vcf.gz
+        tabix sample6_snps_filtered.vcf.gz
         
         
-For the wild populations, the individuals were batched into 4 regions then merged together:
-
-        ref=ref_f.fa
-        region_name=$1 #batch calling, I seperate it into 4 regions.
-        bcftools=~/bin/bcftools-1.16/bcftools
-        ${bcftools} mpileup --threads 20 -Ou -q 20 -Q 20 -R region${region_name}.txt -b bamlist.txt -a FORMAT/AD,FORMAT/DP -f $ref  | ${bcftools} call -mv -Oz -a GQ,GP -o all.fem.LGs${region_name}.vcf.gz
-        tabix all.fem.all_LGs.indels.vcf.gz
-
-Then all files were merged together:
-
-        bcftools merge -m all --threads 12 all.fem.all_LGs.indels.vcf.gz pret_individ.vcf.gz -o all_unfiltered_pret_snps.vcf -O z
-        bcftools view all_unfiltered_pret_snps.vcf | bgzip -c  > all_unfiltered_pret_snps.vcf.gz
-        tabix all_unfiltered_pret_snps.vcf.gz		
-
-## Filtering and calling effect of SNPs and indels
-
-We used **snpEFF** to predict the effect of a SNP as "low", "moderate", or "high" impact on gene function (details can be found **here**), and filtreing was done using **VCFTools**. The VCFs for SNPs and INDELS were done separately to be assessed separately. 
-
-        /Linux/jdk-17.0.5/bin/java -jar ~/snpEff/snpEff.jar download -v Guppy_female_1.0_MT.99
-        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/snpEff.jar -v -stats snpEff_unfiltered_genomic_all_SNPs.html Guppy_female_1.0_MT.99 all_unfiltered_pret_snps.vcf.gz > genomic_SNPs_unfiltered.vcf
-        vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --remove-indels --min-meanDP 7 --max-meanDP 112 --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_no_indels
-        vcftools --vcf genomic_SNPs_unfiltered.vcf --recode --recode-INFO-all --keep-only-indels --min-meanDP 7 --max-meanDP 112  --min-alleles 2 --max-alleles 3 --maf 0.05 --minQ 30 --max-missing 0.9 --out genomic_SNPs_filtered_indels
-
-I separated out the different impacts of the SNPs based on the annotated effect by snpEFF using **snpSift**, examples provided below:
-Low impact:
-
-        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'coding_sequence_variant'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > coding_sequence_variant_variants.vcf	
-
-Moderate impact:
-
-        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'missense_variant'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > missense_variants.vcf
-
-High impact:
-
-        /Linux/jdk-17.0.5/bin/java -Xmx8g -jar ~/snpEff/SnpSift.jar filter "ANN[0].EFFECT has 'stop_gained'" ~/new_Ret_SNPs/snpEff_results/genomic_SNPs_filtered_no_indels.recode.vcf > stop_gained_variants.vcf
-
-
-Files were then concatenated and prepared to run using the Rscript:
-
-        cat high_impact_VCFs > high_impact_variants.vcf
-        sed -i '/^##/d' high_impact_variants.vcf
-        wc -l high_impact_variants.vcf
-
-## Checking for duplicate genes:
-
-I used VCFTools to identify duplicates following the pipeline by **Lin et al. (2022)**:
-
-        vcftools --gzvcf all_unfiltered_pret_snps.vcf.gz --site-depth --keep male_individs.txt --out male_unfilt_markdupe_filtered	
-        vcftools --gzvcf all_unfiltered_pret_snps.vcf.gz --site-depth --keep female_individs.txt --out female_unfilt_markdupe_filtered	
-        python gene_coverage.py gene_boundary.bed male_unfilt_markdupe_filtered.ldepth female_unfilt_markdupe_filtered.ldepth unfilt_markdupe_MFDepth.txt			
+We then prepared the barcode files to run for scAlleleCount.	
         
 
 
