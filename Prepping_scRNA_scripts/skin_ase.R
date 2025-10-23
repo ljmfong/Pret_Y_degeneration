@@ -94,30 +94,6 @@ write.table(cleaned_df, "cellSNP_scAlleleCount/R_results/skin_cleaned_df_gene_at
 cleaned_df <- read.table(file = "cellSNP_scAlleleCount/R_results/skin_cleaned_df_gene_attached.txt", header = T)
 
 ######### Attach to your SingleCellExperiment
-# Filter the cleaned_df for clusters of 10 snps in 100 bp windows
-
-library(data.table)
-
-remove_dense_snps_fast <- function(df, window_bp = 10000, snp_threshold = 500) {
-  setDT(df)
-  df <- df[order(CHROM, geneid, POS)]
-  
-  df[, snps_in_window := {
-    # For each gene, use a moving window to count SNPs efficiently
-    start <- 1L
-    count <- integer(.N)
-    for (i in seq_len(.N)) {
-      while (POS[i] - POS[start] > window_bp) start <- start + 1L
-      count[i] <- i - start + 1L
-    }
-    count
-  }, by = .(CHROM, geneid)]
-  
-  df[snps_in_window <= snp_threshold]
-}
-
-filt_cleaned_df <- remove_dense_snps_fast(cleaned_df)
-
 #OG sce_skin command:
 sce_skin <- SingleCellExperiment(assays=list(counts=counts_skin), colData=metadata_skin)
 
@@ -150,7 +126,7 @@ pb_skin <- aggregate.Matrix(t(counts(sce_skin)), groupings=groups_skin, fun="sum
 ##########################################################
 #### Turn your ase count data into a matrix:
 
-summed_ac_counts <- filt_cleaned_df %>%
+summed_ac_counts <- cleaned_df %>%
   group_by(cells, geneid) %>%
   summarise(ref_count = sum(ref, na.rm = T), alt_count = sum(alt, na.rm = T), .groups = "drop")
 
@@ -243,6 +219,6 @@ working_ac_skin <- working_ac_skin %>%
 working_ac_skin$log10_ref <- log10(working_ac_skin$ref_count)
 working_ac_skin$log10_alt <- log10(working_ac_skin$alt_count)
 
-write.table(working_ac_skin, "cellSNP_scAlleleCount/R_results/snpfilt_skin_filtered10.txt", quote = F, row.names = F)
+write.table(working_ac_skin, "cellSNP_scAlleleCount/R_results/skin_filtered10.txt", quote = F, row.names = F)
 
 
