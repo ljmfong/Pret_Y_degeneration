@@ -25,6 +25,7 @@ library(Matrix)
 library(Matrix.utils)
 library(purrr)
 library(RCurl)
+library(RcpRoll)
 library(scales)
 library(scuttle)
 library(Seurat)
@@ -96,16 +97,6 @@ cleaned_df <- read.table(file = "cellSNP_scAlleleCount/R_results/heart_cleaned_d
 ######## Attach to your SingleCellExperiment ########
 
 # Filter the cleaned_df for clusters of snps in bp windows to remove bias
-
-#A filter that sort of works:
-#remove_dense_snps <- function(df, window = 90000, snp_threshold = 9000) {
-#  df %>%
-#    arrange(CHROM, POS) %>%             
-#    group_by(CHROM) %>%         
-#    mutate(
-#      snp_density = roll_sum(rep(1,n()), n=window, fill = 0)) %>%
-#    filter(snp_density <= snp_threshold) %>% ungroup()
-#}
 
 remove_dense_snps_fast <- function(df, window_bp = 10000, snp_threshold = 500) {
   setDT(df)
