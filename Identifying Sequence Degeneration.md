@@ -1,6 +1,6 @@
 # Identifying Sequence Degeneration:
 
-Here are the commands used to identify the sequence degeneration of _P. reticulata_ following the attainment of Dthe NA sequences from the respective wild populations (Almeida et al. 2021) and lab population (Lin et al. 2023). 
+Here are the commands used to identify the sequence degeneration of _P. reticulata_ following the attainment of the DNA sequences from the respective wild populations (Almeida et al. 2021) and lab population (Lin et al. 2023). 
 ----------------------------------------------------------
 
 ## Alignment to female reference genome
