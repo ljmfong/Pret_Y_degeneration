@@ -100,29 +100,6 @@ write.table(cleaned_df, "cellSNP_scAlleleCount/R_results/liver_cleaned_df_gene_a
 cleaned_df <- read.table(file = "cellSNP_scAlleleCount/R_results/liver_cleaned_df_gene_attached.txt", header = T)
 
 ######### Attach to your SingleCellExperiment
-
-remove_dense_snps_fast <- function(df, window_bp = 10000, snp_threshold = 500) {
-  setDT(df)
-  df <- df[order(CHROM, geneid, POS)]
-  
-  df[, snps_in_window := {
-    # For each gene, use a moving window to count SNPs efficiently
-    start <- 1L
-    count <- integer(.N)
-    for (i in seq_len(.N)) {
-      while (POS[i] - POS[start] > window_bp) start <- start + 1L
-      count[i] <- i - start + 1L
-    }
-    count
-  }, by = .(CHROM, geneid)]
-  
-  df[snps_in_window <= snp_threshold]
-}
-
-
-filt_cleaned_df <- remove_dense_snps_fast(cleaned_df)
-
-
 #OG sce_liver command:
 sce_liver <- SingleCellExperiment(assays=list(counts=counts_liver), colData=metadata_liver)
 
@@ -154,7 +131,7 @@ pb_liver <- aggregate.Matrix(t(counts(sce_liver)), groupings=groups_liver, fun="
 
 ##############
 
-summed_ac_counts <- filt_cleaned_df %>%
+summed_ac_counts <- cleaned_df %>%
   group_by(cells, geneid) %>%
   summarise(ref_count = sum(ref, na.rm = T), alt_count = sum(alt, na.rm = T), .groups = "drop")
 
@@ -250,4 +227,4 @@ working_ac_liver <- working_ac_liver %>%
     grepl("^F2", cells) ~ "F2",
     grepl("^F3", cells) ~ "F3"))
 
-write.table(working_ac_liver, "cellSNP_scAlleleCount/R_results/snpfilt_liver_filtered10.txt", quote = F, row.names = F)
+write.table(working_ac_liver, "cellSNP_scAlleleCount/R_results/liver_filtered10.txt", quote = F, row.names = F)
