@@ -16,6 +16,7 @@ getwd()
 ###################################################
 
 library(cowplot)
+library(data.table)
 library(DESeq2)
 library(dplyr)
 library(ggbreak)
