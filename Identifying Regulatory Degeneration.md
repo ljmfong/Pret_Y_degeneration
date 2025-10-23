@@ -5,7 +5,7 @@ Here are the commands used to identify the regulatory degeneration of _P. reticu
 
 ## Prepping VCF files from theacquired sorted BAM files
 
-We used the possorted_genome_bam.bam files from the scRNA seq data available from Darolti & Mank (2023). We used  **cellSNP-lite [https://github.com/single-cell-genetics/cellSNP (https://cellsnp-lite.readthedocs.io/en/latest/main/manual.html]** to generate our VCF files. Here is an example command:
+We used the possorted_genome_bam.bam files from the scRNA seq data available from Darolti & Mank (2023). We used  **[cellSNP-lite](https://github.com/single-cell-genetics/cellSNP (https://cellsnp-lite.readthedocs.io/en/latest/main/manual.html)** to generate our VCF files. Here is an example command:
 
     bwa mem -t 12 Poecilia_reticulata.Guppy_female_1.0_MT.dna.toplevel.fa sample_forward_R1.fastq.gz sample_reverse_R2.fastq.gz > sample_id.sam
     samtools sort -o sample_id.sorted.sam sample_id.sam
