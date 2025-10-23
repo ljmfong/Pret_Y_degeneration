@@ -19,3 +19,6 @@ Scripts used to identify sequence and regulatory degeneration on the Y chromosom
 ## 3. Sequence Degeneration Prediction
 
 - AlphaFold
+- FoldX
+- SWISS-MODELer
+- UniProt
