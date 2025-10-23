@@ -1,24 +1,16 @@
 # Pret_Y_degeneration
-Scripts used to identify sequence and regulatory degeneration on the Y chromosome of Poecilia reticulata
+Scripts used to identify sequence and regulatory degeneration on the Y chromosome of _Poecilia reticulata_
 
 -----------------------------------------------------------------------------------
 
 ## 1. Identifying Sequence Degeneration
 
-- Wild population & Lab population
-- SnpEff & SnpSift
-- VCFtools & BCFtools
-- Identify potential gene duplication via M:F Read Depth
-
+See README file: https://github.com/ljmfong/Pret_Y_degeneration/blob/main/01.Identifying%20Sequence%20Degeneration.md
 
 ## 2. Identifying Regulatory Degeneration
 
-- scRNAseq
-- scAlleleCount (https://github.com/barkasn/scAlleleCount) 
+See README file: https://github.com/ljmfong/Pret_Y_degeneration/blob/main/02.Identifying%20Regulatory%20Degeneration.md
 
 ## 3. Sequence Degeneration Prediction
 
-- AlphaFold
-- FoldX
-- SWISS-MODELer
-- UniProt
+See README file: https://github.com/ljmfong/Pret_Y_degeneration/blob/main/03.Predicting%20Protein%20Folding%20Changes.md
