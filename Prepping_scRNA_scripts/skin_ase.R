@@ -16,6 +16,7 @@ getwd()
 #### 1. Load in required packages ####
 
 library(cowplot)
+library(data.table)
 library(DESeq2)
 library(dplyr)
 library(ggbreak)
