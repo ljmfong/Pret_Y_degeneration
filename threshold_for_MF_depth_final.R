@@ -76,10 +76,3 @@ sample estimates:
 
 write.table(genes_to_test, "check_for_dupes/organize_the_pute_dupes.txt", quote = F, row.names = F, sep = "\t")
 
-
-
-
-
-
-
-
