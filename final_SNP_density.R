@@ -107,8 +107,14 @@ rm_invariants <- plot_hetero_ratios %>%
 rm_invariants_uniq <- rm_invariants %>%
   distinct(POS, .keep_all = TRUE)
 
-autosomes <- subset(rm_invariants_uniq, CHROM != "LG12")
-only_LG12 <- subset(rm_invariants_uniq, CHROM == "LG12")
+rm_invariants_highend <- rm_invariants_uniq %>%
+  filter(Female_Heterozygous_Counts > 0 & Male_Heterozygous_Counts < 51) %>%
+  filter(Male_Heterozygous_Counts > 0 & Female_Heterozygous_Counts < 51)
+
+write.table(rm_invariants_highend, file = "All_impact_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = T)
+
+autosomes <- subset(rm_invariants_highend, CHROM != "LG12")
+only_LG12 <- subset(rm_invariants_highend, CHROM == "LG12")
 
 range(rm_invariants$MF_log2)
 #[1] -7.238405  8.535275
