@@ -107,9 +107,9 @@ rm_invariants <- plot_hetero_ratios %>%
 rm_invariants_uniq <- rm_invariants %>%
   distinct(POS, .keep_all = TRUE)
 
+rm_invariants_uniq$sum <- rm_invariants_uniq$Male_Heterozygous_Counts + rm_invariants_uniq$Female_Heterozygous_Counts
 rm_invariants_highend <- rm_invariants_uniq %>%
-  filter(Female_Heterozygous_Counts > 0 & Male_Heterozygous_Counts < 51) %>%
-  filter(Male_Heterozygous_Counts > 0 & Female_Heterozygous_Counts < 51)
+  filter(sum < 118)
 
 write.table(rm_invariants_highend, file = "All_impact_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = T)
 
