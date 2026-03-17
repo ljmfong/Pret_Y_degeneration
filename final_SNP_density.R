@@ -106,11 +106,10 @@ rm_invariants <- plot_hetero_ratios %>%
 
 rm_invariants_uniq <- rm_invariants %>%
   distinct(POS, .keep_all = TRUE)
-
-rm_invariants_uniq$sum <- rm_invariants_uniq$Male_Heterozygous_Counts + rm_invariants_uniq$Female_Heterozygous_Counts
+                               
 rm_invariants_highend <- rm_invariants_uniq %>%
-  filter(sum < 118)
-
+  filter(Male_Heterozygous_Counts > 12 & Female_Heterozygous_Counts > 12)
+                               
 write.table(rm_invariants_highend, file = "All_impact_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = T)
 
 autosomes <- subset(rm_invariants_highend, CHROM != "LG12")
