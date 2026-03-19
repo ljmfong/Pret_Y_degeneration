@@ -107,8 +107,9 @@ rm_invariants <- plot_hetero_ratios %>%
 rm_invariants_uniq <- rm_invariants %>%
   distinct(POS, .keep_all = TRUE)
 rm_invariants_uniq$sum <- rm_invariants_uniq$Male_Heterozygous_Counts + rm_invariants_uniq$Female_Heterozygous_Counts
-rm_invariants_highend <- rm_invariants_uniq %>% filter(sum < 118)
+rm_invariants_highend <- rm_invariants_uniq %>% filter(sum < 114)
 
+write.table(rm_invariants_highend, file = "All_impact_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = T)
                                
 autosomes <- subset(rm_invariants_uniq, CHROM != "LG12")
 only_LG12 <- subset(rm_invariants_uniq, CHROM == "LG12")
@@ -302,13 +303,6 @@ combo_snp_change <- rbind(snp_change_high, snp_change_mod)
 
 write.table(combo_snp_change, "snp_change_LG12.txt", sep = "\t", quote = F)
 
-###### To filter for minimum number of individuals (SNP present in 10% for each sex)
-                               
-rm_invariants_highend <- rm_invariants_uniq %>%
-  filter(Male_Heterozygous_Counts > 12 & Female_Heterozygous_Counts > 12)
-                               
-write.table(rm_invariants_highend, file = "All_impact_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = T)
-
-                               
+                             
 
 
