@@ -106,6 +106,9 @@ rm_invariants <- plot_hetero_ratios %>%
 
 rm_invariants_uniq <- rm_invariants %>%
   distinct(POS, .keep_all = TRUE)
+rm_invariants_uniq$sum <- rm_invariants_uniq$Male_Heterozygous_Counts + rm_invariants_uniq$Female_Heterozygous_Counts
+rm_invariants_highend <- rm_invariants_uniq %>% filter(sum < 118)
+
                                
 autosomes <- subset(rm_invariants_uniq, CHROM != "LG12")
 only_LG12 <- subset(rm_invariants_uniq, CHROM == "LG12")
