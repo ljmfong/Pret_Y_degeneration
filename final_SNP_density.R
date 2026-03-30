@@ -303,6 +303,109 @@ combo_snp_change <- rbind(snp_change_high, snp_change_mod)
 
 write.table(combo_snp_change, "snp_change_LG12.txt", sep = "\t", quote = F)
 
+###########################################################################################
+###### Load up the LOW impact files that were sorted with SnpSift: SNPs first #######
+###########################################################################################
+
+
+low_impact_snps <- read.table(file = "filtered_combo_SNPs/formatted_low_impact_SNPs.vcf", sep = "\t", header = TRUE)
+
+# 2. Clean up the descriptions in the file
+#First we'll do the high-impact SNPs
+
+unchanged_columns <- data.frame(low_impact_snps[, 1:2])
+cleaned_GT <- data.frame(apply(low_impact_snps[, 10:135], 2, function(x) gsub(":.*", "",x)))
+final_GT_low_impact <- cbind(unchanged_columns,cleaned_GT)
+final_GT_low_impact$IMPACT <- "low"
+
+#Count the number of SNPs and remove min allele freq. < 5% a.k.a 6 individuals
+
+count_SNPs <- data.frame(rowSums(final_GT_low_impact == "0/1" | final_GT_low_impact == "0/2" | final_GT_low_impact == "1/2"))
+
+combo_snps_unfilt <- cbind(final_GT_low_impact, count_SNPs)
+colnames(combo_snps_unfilt)[130] <- "SNP_count"
+
+
+#Note: You have already filtered out for the max missing of 10% in your VCF file:
+combo_snps <- combo_snps_unfilt %>%
+  filter(SNP_count > 12)
+
+# 3. Read in chromosomes & Organize SNPs by sexes
+
+chr_sizes <- read.table(file = "//files.zoology.ubc.ca/ljmfong/flex/guppy_chrms_len.txt", sep = "\t", header = TRUE)
+
+#In order to plot your SNPs, you'll want to layer your males and females - therefore it's best two make two dataframes
+#for your plot. In this case, you're going to make one for males (high & moderate impact) and one for females.
+
+male_snps <- cbind(combo_snps[, 1:2], combo_snps[, 13:22], combo_snps[, 33:42], combo_snps[, 53:61],
+                   combo_snps[, 72:81], combo_snps[, 92:101], combo_snps[, 112:122], combo_snps[, 126:129])
+
+female_snps <- cbind(combo_snps[, 1:12], combo_snps[, 23:32], combo_snps[, 43:52], combo_snps[, 62:71],
+                     combo_snps[, 82:91], combo_snps[, 102:111], combo_snps[, 123:125], combo_snps[, 129])
+colnames(female_snps)[66] <- "IMPACT"
+
+male_snps$CHROM <- factor(male_snps$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+female_snps$CHROM <- factor(female_snps$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+chr_sizes$CHROM <- factor(chr_sizes$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+
+
+# 4. Re-organize to account for the number of SNPs present
+#You will want to count how many individuals that are female vs males) are heterozygous
+
+fem_heter <- data.frame(rowSums(female_snps == "0/1" | female_snps == "0/2" | female_snps == "1/2"))
+male_heter <- data.frame(rowSums(male_snps == "0/1" | male_snps == "0/2" | male_snps == "1/2"))
+
+plot_male <- cbind(male_snps[,1:2], male_snps[,66], male_heter)
+colnames(plot_male)[3]<- "IMPACT"
+colnames(plot_male)[4] <- "hetero_counts"
+
+plot_female <- cbind(female_snps[,1:2], female_snps[,66], fem_heter)
+colnames(plot_female)[3]<- "IMPACT"
+colnames(plot_female)[4] <- "hetero_counts"
+
+plot_hetero_ratios <- cbind(male_snps[,1:2], male_snps[,66], male_heter, fem_heter)
+colnames(plot_hetero_ratios)[3]<- "IMPACT"
+colnames(plot_hetero_ratios)[4]<- "Male_Heterozygous_Counts"
+colnames(plot_hetero_ratios)[5]<- "Female_Heterozygous_Counts"
+
+MF_ratio <- log2((plot_male$hetero_counts+0.1)/(plot_female$hetero_counts+0.1))
+MF_count_ratio <- (plot_male$hetero_counts+0.1)/(plot_female$hetero_counts+0.1)
+
+plot_hetero_ratios$MF_log2 <- MF_ratio
+plot_hetero_ratios$MF_count_ratio <- MF_count_ratio
+colnames(plot_hetero_ratios)[6] <- "MF_log2"
+
+
+# 5. Remove also the errors that are found in the reference genome 
+# e.g. all males  and all females are heterozygous at one site
+
+rm_invariants <- subset(plot_hetero_ratios, MF_log2 != 0.00000000)
+rm_invariants_uniq <- rm_invariants %>%
+  distinct(POS, .keep_all = TRUE)
+rm_invariants_uniq$sum <- rm_invariants_uniq$Male_Heterozygous_Counts + rm_invariants_uniq$Female_Heterozygous_Counts
+rm_invariants_highend <- rm_invariants_uniq %>% filter(sum < 114)
+
+write.table(rm_invariants_highend, file = "LOW_SNPs_min_individ_filtered.txt", sep = "\t", quote = F, row.names = F)
+
+
+autosomes <- subset(rm_invariants_uniq, CHROM != "LG12")
+only_LG12 <- subset(rm_invariants_uniq, CHROM == "LG12")
+
+range(rm_invariants_uniq$MF_log2)
+#[1]-7.499846  8.573647
+
+# 6. Organize sex-limited SNPs:
+
+male_limited_low <- subset(rm_invariants_uniq, Female_Heterozygous_Counts == 0)
+female_limited_low <- subset(rm_invariants_uniq, Male_Heterozygous_Counts == 0)
+
+write.table(male_limited_low, file = "all_male_limited_LOW.txt",
+            sep = "\t", row.names = TRUE, quote = F)
+
+sex_limited_all_low <- rbind(male_limited_low, female_limited_low)
+write.table(sex_limited_all_low, file = "All_sex_limited_LOW.txt",
+            sep = "\t", row.names = TRUE, quote = F)
+
                              
 
 
