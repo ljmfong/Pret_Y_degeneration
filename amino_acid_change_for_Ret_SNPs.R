@@ -41,7 +41,7 @@ autosome_aa_change <- subset(count_aa_change, CHROM != "LG12")
 other_sexlim_list <- c(20150922, 3369885, 2860383, 2860420, 2860509, 2860512, 2860711, 2860642, 2860921, 22642317, 7652342)
 
 autosome_aa_change <- autosome_aa_change %>%
-  filter(!POS %in% other_sexlim_list) #I have 95,693 SNPs
+  filter(!POS %in% other_sexlim_list) 
 
 sexchromo_aa_change <- subset(count_aa_change, CHROM == "LG12")
 
@@ -57,41 +57,27 @@ sexchromo_aa_change <- sexchromo_aa_change %>%
   filter(!POS %in% sexlim_list) #I have 5,394 SNPs
 
 
-nonsex_specific_snps <- rbind(autosome_aa_change, sexchromo_aa_change) # I have 101,160 SNPs
+nonsex_specific_snps <- rbind(autosome_aa_change, sexchromo_aa_change)
 
     ### Look at the percent change in the amino acids - overall ###
 
-  # 0. Non-sex specific:
+  # Non-sex specific:
 
-count(nonsex_specific_snps, sum == 0) # 31061 show no change across all properties (30.70%)
-count(nonsex_specific_snps, sum == 1) # 45645 show one change across all properties (45.12%)
-count(nonsex_specific_snps, sum == 2) # 21766 show two changes across all properties (21.9%)
-count(nonsex_specific_snps, sum == 3) # 2688 show change across all properties (2.66%)
+count(nonsex_specific_snps, sum == 0) # 31061 show no change across all properties 
+count(nonsex_specific_snps, sum == 1) # 45645 show one change across all properties
+count(nonsex_specific_snps, sum == 2) # 21766 show two changes across all properties 
+count(nonsex_specific_snps, sum == 3) # 2688 show change across all properties
 
-  # 1. Sex chromosome
+  # Compared to your missense SNPs that are sex-limited (66):
 
-count(sexchromo_aa_change, sum == 0) # 1624 show no change across all properties (30.1%)
-count(sexchromo_aa_change, sum == 1) # 2436 show one change across all properties (45.2%)
-count(sexchromo_aa_change, sum == 2) # 1183 show two changes across all properties (21.52%)
-count(sexchromo_aa_change, sum == 3) # 151 show change across all properties (2.8%)
+# 0 changes = 20/66
+# 1 change = 29/66
+# 2 changes = 12/66 
+# 3 changes = 5/66 
 
-  # 2. Autosomes
-
-count(autosome_aa_change, sum == 0) # 29415 (30.7%)
-count(autosome_aa_change, sum == 1) # 43178 (45.1%)
-count(autosome_aa_change, sum == 2) # 20569 (21.5%)
-count(autosome_aa_change, sum == 3) # 2531 (2.6%)
-
-  # 3. Compared to your missense SNPs that are sex-limited (66):
-
-# 0 changes = 20/66 =
-# 1 change = 29/66 =
-# 2 changes = 12/66 = 
-# 3 changes = 5/66 = 
-
-# Structure = 19/66 = 
-# Polarity = 31/66 = 
-# Charge = 19/66 =
+# Structure = 19/66 
+# Polarity = 31/66 
+# Charge = 19/66
 
 #### Calculate Stats ###
 
@@ -112,130 +98,7 @@ chisq.test(snp_rows)
 
 fisher.test(snp_rows, simulate.p.value = TRUE, B = 1e5) # p-value = 0.3823
 
-prop.test(snp_rows)
 
-
-############################################
-
-# 1. No changes
-
-prop.test(c(31061, 19),
-          c(101160, 62))
-# Output: X-squared = 0.95684, df = 2, p-value = 1
-
-# 2. One change
-
-prop.test(c(45645, 27),
-          c(101160, 62))
-#Output: X-squared = 0.065367, df = 2, p-value = 0.9035
-
-# 3. Two changes
-
-prop.test(c(21766, 12),
-          c(101160, 62))
-#Output: X-squared = 0.74913, df = 2, p-value = 0.7953
-
-# 4. All changes
-
-prop.test(c(2688, 4),
-          c(101160, 62))
-#Output: X-squared = 3.9299, df = 2, p-value = 0.1439
-
-
-
-  ### Look at the percent change in the amino acids - individual properties ###
-
-  # 1. Structure
-
-count(autosome_aa_change, structure == 1) # 23196 (24.24%)
-count(sexchromo_aa_change, structure == 1) # 1375 (25.5%)
-count(nonsex_specific_snps, structure == 1) # 24571 (24.29%)
-
-  # 2. Polarity
-
-count(autosome_aa_change, polarity == 1) # 37423 (39.11%)
-count(sexchromo_aa_change, polarity == 1) # 2133 (39.54%)
-count(nonsex_specific_snps, polarity == 1) # 39556 (39.10%)
-
-  # 3. Charge
-
-count(autosome_aa_change, charge == 1) # 31290 (32.70%)
-count(sexchromo_aa_change, charge == 1) # 1824 (33.82%)
-count(nonsex_specific_snps, charge == 1) # 33114 (32.73)
-
-
-    #### Calculate Stats ###
-
-
-# 5. Strucutre
-
-prop.test(c(24571, 16),
-          c(101160, 62))
-# Output: X-squared = 0.95684, df = 2, p-value = 0.8963
-
-# 6. Polarity
-
-prop.test(c(39556, 31),
-          c(101160, 62))
-#Output: X-squared = 0.065367, df = 2, p-value = 0.1036
-
-# 7. Charge
-
-prop.test(c(33114, 16),
-          c(101160, 62))
-#Output: X-squared = 0.74913, df = 2, p-value = 0.3045
-
-
-######################################################################
-############# When split up across chromosome types ##################
-######################################################################
-
-# Proportion test -  Number of changes:
-
-  # 1. No changes
-
-prop.test(c(29415, 1624, 19),
-          c(95693, 5394, 62))
-# Output: X-squared = 0.95684, df = 2, p-value = 0.6198
-
-  # 2. One change
-
-prop.test(c(43178, 2436, 27),
-          c(95693, 5394, 62))
-#Output: X-squared = 0.065367, df = 2, p-value = 0.9678
-
-  # 3. Two changes
-
-prop.test(c(20569, 1183, 12),
-          c(95693, 5394, 62))
-#Output: X-squared = 0.74913, df = 2, p-value = 0.6876
-
-  # 4. All changes
-
-prop.test(c(2531, 151, 4),
-          c(95693, 5394, 62))
-#Output: X-squared = 3.9299, df = 2, p-value = 0.1402
-
-
-# Proportion test -  Type of changes:
-
-  # 1. Structure
-
-prop.test(c(23196, 1375, 16),
-          c(95693, 5394, 62))
-# Output: X-squared = 4.4209, df = 2, p-value = 0.1097
-
-  # 2. Polarity
-
-prop.test(c(37423, 2133, 31),
-          c(95693, 5394, 62))
-#Output: X-squared = 3.4818, df = 2, p-value = 0.1754
-
-  # 3. Charge
-
-prop.test(c(31290, 1824, 16),
-          c(95693, 5394, 62))
-#Output: X-squared = 4.2521, df = 2, p-value = 0.1193
 
 
 
