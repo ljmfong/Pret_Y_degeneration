@@ -406,6 +406,83 @@ sex_limited_all_low <- rbind(male_limited_low, female_limited_low)
 write.table(sex_limited_all_low, file = "All_sex_limited_LOW.txt",
             sep = "\t", row.names = TRUE, quote = F)
 
+##########################################################################
+####### Looking at modifier impact was done on R through the cluster #####
+##########################################################################
+                               
+sex_limited_mofs_uniq <- read.table(file = "All_sex_limited_mofs.txt", header = T)
+
+male_limited_mofs <- subset(sex_limited_mofs_uniq, Female_Heterozygous_Counts == 0)
+female_limited_mofs <- subset(sex_limited_mofs_uniq, Male_Heterozygous_Counts == 0)
+male_limited_mofs <- male_limited_mofs %>% filter(Male_Heterozygous_Counts > 13)
+female_limited_mofs <- female_limited_mofs %>% filter(Female_Heterozygous_Counts > 13)
+
+chr_sizes <- read.table(file = "//files.zoology.ubc.ca/ljmfong/flex/guppy_chrms_len.txt", sep = "\t", header = TRUE)
+
+male_limited_mofs$CHROM <- factor(male_limited_mofs$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+female_limited_mofs$CHROM <- factor(female_limited_mofs$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+chr_sizes$CHROM <- factor(chr_sizes$CHROM, paste0('LG', 1:23), paste0('LG', 1:23))
+
+male_limited_mofs_LG12 <- subset(male_limited_mofs, CHROM == "LG12")
+female_limited_mofs_LG12 <- subset(female_limited_mofs, CHROM == "LG12")
+
+only_LG12 <- subset(chr_sizes, CHROM == "LG12")
+
+plot_LG12_lollipop <- ggplot(only_LG12, aes(x= POS/1000000)) +
+  scale_x_continuous(lim = c(0, 27000000), breaks = c(0, 5e6, 10e6, 15e6, 20e6, 25e6), 
+                     labels = ~.x / 1e6, name = 'Chromosome 12 (Mb)') +
+  scale_y_continuous(expand = c(0,0), lim = c(0, 40)) +
+  theme_classic() +
+  theme(
+    legend.position = 'top', strip.placement = 'outside',
+    strip.background = eb, strip.text.y.left = element_text(angle = 0, size = 16), 
+    axis.line = element_line(colour = "black", size = 1.2), axis.ticks = element_line(size = 1.5),
+    axis.text = element_text(size = 16), axis.title = element_text(size = 16)
+  ) + ylab("# of Individuals w/ SNP") + xlab("Chromosome 12 (Mb)") + 
+  labs(values = c("Male", "Female"))
+
+
+plot_LG12_lollipop +
+  annotate("rect", xmin = 20e6, xmax = 26e6, ymin = 0, ymax = 40, fill = 'mediumpurple3', alpha = 0.3) +
+  geom_segment(data = male_limited_mofs_LG12,
+               aes(x = POS, y = 0, yend = Male_Heterozygous_Counts), size = 1) +
+  geom_point(data = male_limited_mofs_LG12, aes(x = POS, y = Male_Heterozygous_Counts),
+             size = 5, col = "navy", fill = alpha("cornflowerblue", 0.6), shape = 21, stroke = 1.5) +
+  geom_segment(data = female_limited_mofs_LG12, 
+               aes(x = POS, y = 0, yend = Female_Heterozygous_Counts), size = 1) +
+  geom_point(data = female_limited_mofs_LG12, aes(x = POS, y = Female_Heterozygous_Counts),
+             size = 5, col = "firebrick4", fill = alpha("firebrick3", 0.6), shape = 21, stroke = 1.5)
+
+chr_sizes$start <- 0
+
+base_wouter <- ggplot() +
+  geom_rect(data = chr_sizes, aes(xmin = 0, xmax = LEN, ymin = 0, ymax = 40), col = NA, fill = 'grey95', orientation = 'y') +
+  geom_rect(data = subset(chr_sizes, CHROM == "LG12"), aes(xmin = 20e6, xmax = 26e6, ymin = 0, ymax = 40), col = NA, fill = 'mediumpurple3', orientation = 'y', alpha = 0.3) +
+  geom_segment(aes(x = 0, xend = LEN, y = 0, yend = 0), chr_sizes, col = "black") +
+  scale_x_continuous(expand = c(0,0), labels = ~.x / 1e6, name = 'Chromosomal position (Mb)') +
+  scale_y_continuous(breaks = c(10, 40)) +
+  facet_grid(rows = vars(CHROM), switch = 'y') +
+  theme_classic() +
+  theme(
+    legend.position = 'top', strip.placement = 'outside',
+    strip.background = eb, strip.text.y.left = element_text(angle = 0,size = 15),
+    axis.text = element_text(size = 15), axis.title = element_text(size = 30)
+  ) + ylab("Chromosomes") +  xlab("Chromosome (Mb)") +
+  labs(alpha = "# of Individuals w/ SNP")
+
+base_wouter 
+
+base_wouter +
+  geom_linerange(data = male_limited_mofs, 
+                 aes(x = POS, ymin = 0, ymax = Male_Heterozygous_Counts), size = 1) +
+  geom_point(data = male_limited_mofs, aes(x = POS, y = Male_Heterozygous_Counts),
+             size = 4, col = "navy", fill = alpha("cornflowerblue", 0.6), shape = 21, stroke = 1.5) +
+  geom_linerange(data = female_limited_mofs, 
+                 aes(x = POS, ymin = 0, ymax = Female_Heterozygous_Counts), size = 1) +
+  geom_point(data = female_limited_mofs, aes(x = POS, y = Female_Heterozygous_Counts),
+             size = 4, col = "firebrick4", fill = alpha("firebrick3", 0.6), shape = 21, stroke = 1.5)
+
+
                              
 
 
