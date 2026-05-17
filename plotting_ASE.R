@@ -206,7 +206,7 @@ plot_somatic_boxplot <- ggplot(M_somatic_genes_combo, aes(x = geneid, y = count,
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
   #geom_jitter(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), size = 4, alpha = 0.5) +
-  scale_fill_manual(values = c("seagreen", "slategray3")) + scale_colour_manual(values = c("darkgreen", "slategray4")) +
+  scale_fill_manual(values = c("#1A85FF", "slategray3")) + scale_colour_manual(values = c("navy", "slategray4")) +
   ylab("Allele Count") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -228,7 +228,7 @@ F_somatic_genes_combo <- F_somatic_genes_combo %>% mutate(geneid = case_when(
 F_plot_somatic_boxplot <- ggplot(F_somatic_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("pink", "slategray3")) + scale_colour_manual(values = c("pink3", "slategray4")) +
+  scale_fill_manual(values = c("#D41159", "slategray3")) + scale_colour_manual(values = c("firebrick4", "slategray4")) +
   ylab("Allele Count") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") + ggtitle("") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20),
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -326,7 +326,7 @@ M_gonad_genes_combo <- M_gonad_genes_combo %>% mutate(geneid = case_when(
 plot_gonad_boxplot <- ggplot(M_gonad_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("seagreen", "slategray3")) + scale_colour_manual(values = c("darkgreen", "slategray4")) +
+  scale_fill_manual(values = c("#1A85FF", "slategray3")) + scale_colour_manual(values = c("navy", "slategray4")) +
   ylab("Allele Count") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -342,7 +342,7 @@ F_gonad_genes_combo <- F_gonad_genes_combo %>% mutate(geneid = case_when(geneid 
 F_plot_gonad_boxplot <- ggplot(F_gonad_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("pink", "slategray3")) + scale_colour_manual(values = c("pink3", "slategray4")) +
+  scale_fill_manual(values = c("#D41159", "slategray3")) + scale_colour_manual(values = c("firebrick4", "slategray4")) +
   ylab("Allele Count") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") + ggtitle("") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -359,7 +359,7 @@ F_plot_gonad_boxplot
 plot_somatic_boxplot_v2 <- ggplot(M_somatic_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("seagreen", "slategray3")) + scale_colour_manual(values = c("darkgreen", "slategray4")) +
+  scale_fill_manual(values = c("#1A85FF", "slategray3")) + scale_colour_manual(values = c("navy", "slategray4")) +
   ylab("Allele Count") + xlab("") + labs(fill = "Allele Type", col = "Allele Type") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -371,7 +371,7 @@ plot_somatic_boxplot_v2 <- ggplot(M_somatic_genes_combo, aes(x = geneid, y = cou
 plot_gonad_boxplot_v2 <- ggplot(M_gonad_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("seagreen", "slategray3")) + scale_colour_manual(values = c("darkgreen", "slategray4")) +
+  scale_fill_manual(values = c("#1A85FF", "slategray3")) + scale_colour_manual(values = c("navy", "slategray4")) +
   ylab("") + xlab("") + labs(fill = "Allele Type", col = "Allele Type") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -383,7 +383,7 @@ plot_gonad_boxplot_v2 <- ggplot(M_gonad_genes_combo, aes(x = geneid, y = count, 
 F_plot_somatic_boxplot_v2 <- ggplot(F_somatic_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("pink", "slategray3")) + scale_colour_manual(values = c("pink3", "slategray4")) +
+  scale_fill_manual(values = c("#D41159", "slategray3")) + scale_colour_manual(values = c("firebrick4", "slategray4")) +
   ylab("Allele Count") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") + ggtitle("") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20),
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
@@ -395,7 +395,7 @@ F_plot_somatic_boxplot_v2 <- ggplot(F_somatic_genes_combo, aes(x = geneid, y = c
 F_plot_gonad_boxplot_v2 <- ggplot(F_gonad_genes_combo, aes(x = geneid, y = count, fill = count_type, col = count_type)) +
   geom_boxplot(position = position_dodge(width = 0.8), outlier.size = 4, lwd = 1.5) +
   scale_y_continuous(expand = c(0,0), lim = c(0, 65)) +
-  scale_fill_manual(values = c("pink", "slategray3")) + scale_colour_manual(values = c("pink3", "slategray4")) +
+  scale_fill_manual(values = c("#D41159", "slategray3")) + scale_colour_manual(values = c("firebrick4", "slategray4")) +
   ylab("") + xlab("Gene") + labs(fill = "Allele Type", col = "Allele Type") + ggtitle("") +
   theme_classic() + theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20), 
                           axis.text.x = element_text(size = 16, angle = 25, vjust = 0.95, hjust = 0.9, face = "bold"), 
